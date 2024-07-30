@@ -36,9 +36,13 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: EdgeInsets.symmetric(vertical: 20.h),
             itemBuilder: (context, index) {
               return homeController.isLoading.value
-                  ? const Center(
-                      child: CircularProgressIndicator(
-                        color: primaryColor,
+                  ? SizedBox(
+                      height: 50.h,
+                      width: 50.h,
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          color: primaryColor,
+                        ),
                       ),
                     )
                   : Container(

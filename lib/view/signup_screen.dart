@@ -2,6 +2,7 @@ import 'package:comments_app/utils/colors.dart';
 import 'package:comments_app/view/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 import '../controller/auth_controller.dart';
@@ -17,10 +18,6 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailTextController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
-  FocusNode nameFocusNode = FocusNode();
-  FocusNode emailFocusNode = FocusNode();
-  FocusNode passwordFocusNode = FocusNode();
 
   AuthController authController = Get.put(AuthController());
   @override
@@ -40,17 +37,26 @@ class _SignupScreenState extends State<SignupScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Spacer(),
+            const Spacer(),
             commonTextField(nameController, 'Name', false),
             commonTextField(emailTextController, 'Email', false),
             Obx(() => commonTextField(passwordController, 'Password', true)),
-            Spacer(),
-            buttonWidget(() {
-              authController.signUp(
-                  context, nameController, emailTextController, passwordController);
-              // Navigator.pushAndRemoveUntil(context,
-              //     MaterialPageRoute(builder: (context) => LoginScreen()), (route) => false);
-            }, 'Signup'),
+            const Spacer(),
+            Obx(() => buttonWidget(() {
+                  if (nameController.value.text.isNotEmpty &&
+                      emailTextController.value.text.isNotEmpty &&
+                      passwordController.value.text.isNotEmpty) {
+                    authController.signUp(
+                        context, nameController, emailTextController, passwordController);
+                  } else {
+                    Fluttertoast.showToast(
+                        msg: "Enter Login Details",
+                        toastLength: Toast.LENGTH_SHORT,
+                        backgroundColor: Colors.red.shade200,
+                        textColor: black,
+                        fontSize: 14.sp);
+                  }
+                }, 'Signup')),
             SizedBox(height: 10.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -65,7 +71,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 InkWell(
                   onTap: () {
                     Navigator.pushReplacement(
-                        context, MaterialPageRoute(builder: (context) => LoginScreen()));
+                        context, MaterialPageRoute(builder: (context) => const LoginScreen()));
                   },
                   child: Text(
                     ' Login',
@@ -131,15 +137,23 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget buttonWidget(void Function() onTap, String text) {
     return ElevatedButton(
         style: ButtonStyle(
-          shape: MaterialStatePropertyAll(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r))),
-          padding: MaterialStatePropertyAll(EdgeInsets.symmetric(horizontal: 90.w, vertical: 12.h)),
-          backgroundColor: MaterialStatePropertyAll(Color(0xff0c54be)),
-        ),
+            shape: WidgetStatePropertyAll(
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r))),
+            padding: WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 5.h)),
+            backgroundColor: const WidgetStatePropertyAll(Color(0xff0c54be)),
+            fixedSize: WidgetStatePropertyAll(Size(250.w, 50.h))),
         onPressed: onTap,
-        child: Text(
-          text,
-          style: TextStyle(fontSize: 16.sp, color: Colors.white, fontWeight: FontWeight.bold),
-        ));
+        child: authController.isLoading.value
+            ? SizedBox(
+                height: 30.h,
+                width: 30.h,
+                child: const CircularProgressIndicator(
+                  color: white,
+                ),
+              )
+            : Text(
+                text,
+                style: TextStyle(fontSize: 16.sp, color: Colors.white, fontWeight: FontWeight.bold),
+              ));
   }
 }
