@@ -1,9 +1,10 @@
-import 'package:comments_app/controller/signup_controller.dart';
 import 'package:comments_app/utils/colors.dart';
 import 'package:comments_app/view/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+
+import '../controller/auth_controller.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -13,7 +14,15 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  SignupController signup = Get.put(SignupController());
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailTextController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  FocusNode nameFocusNode = FocusNode();
+  FocusNode emailFocusNode = FocusNode();
+  FocusNode passwordFocusNode = FocusNode();
+
+  AuthController authController = Get.put(AuthController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,13 +41,15 @@ class _SignupScreenState extends State<SignupScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Spacer(),
-            commonTextField(signup.nameController.value, 'Name', false),
-            commonTextField(signup.emailController.value, 'Email', false),
-            commonTextField(signup.passwordController.value, 'Password', true),
+            commonTextField(nameController, 'Name', false),
+            commonTextField(emailTextController, 'Email', false),
+            Obx(() => commonTextField(passwordController, 'Password', true)),
             Spacer(),
             buttonWidget(() {
-              Navigator.pushAndRemoveUntil(context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()), (route) => false);
+              authController.signUp(
+                  context, nameController, emailTextController, passwordController);
+              // Navigator.pushAndRemoveUntil(context,
+              //     MaterialPageRoute(builder: (context) => LoginScreen()), (route) => false);
             }, 'Signup'),
             SizedBox(height: 10.h),
             Row(
@@ -64,71 +75,71 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 30.h),
+            SizedBox(height: 40.h),
           ],
         ),
       ),
     );
   }
-}
 
-Widget commonTextField(TextEditingController controller, String hintText, bool isPassword) {
-  return Container(
-    padding: EdgeInsets.symmetric(vertical: 5.h),
-    margin: EdgeInsets.symmetric(vertical: 5.h),
-    child: TextField(
-      controller: controller,
-      obscureText: isPassword ? true : false,
-      style: TextStyle(color: black, fontSize: 14.sp),
-      textAlignVertical: TextAlignVertical.center,
-      decoration: InputDecoration(
-          // suffixIcon: isPassword
-          //     ? InkWell(
-          //     splashFactory: NoSplash.splashFactory,
-          //     onTap: () {
-          //       signup.obscurePassword.value = !signup.obscurePassword.value;
-          //     },
-          //     child: Icon(
-          //         signup.obscurePassword.value
-          //             ? Icons.visibility_off_rounded
-          //             : Icons.visibility,
-          //         size: 20))
-          //     : const SizedBox(),
-          contentPadding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 5.h),
-          enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide.none,
-              gapPadding: 2,
-              borderRadius: BorderRadius.circular(15.r)),
-          disabledBorder: OutlineInputBorder(
-              borderSide: BorderSide.none,
-              gapPadding: 2,
-              borderRadius: BorderRadius.circular(15.r)),
-          hintText: hintText,
-          filled: true,
-          fillColor: white,
-          focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15.r),
-              gapPadding: 2,
-              borderSide: BorderSide(
-                color: bgColor,
-                width: 2.w,
-              )),
-          hintStyle: TextStyle(color: black, fontSize: 14.sp)),
-    ),
-  );
-}
-
-Widget buttonWidget(void Function() onTap, String text) {
-  return ElevatedButton(
-      style: ButtonStyle(
-        shape: MaterialStatePropertyAll(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r))),
-        padding: MaterialStatePropertyAll(EdgeInsets.symmetric(horizontal: 90.w, vertical: 12.h)),
-        backgroundColor: MaterialStatePropertyAll(Color(0xff0c54be)),
+  Widget commonTextField(TextEditingController controller, String hintText, bool isPassword) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 5.h),
+      margin: EdgeInsets.symmetric(vertical: 5.h),
+      child: TextField(
+        controller: controller,
+        obscureText: isPassword ? authController.obscurePassword.value : false,
+        style: TextStyle(color: black, fontSize: 14.sp),
+        textAlignVertical: TextAlignVertical.center,
+        decoration: InputDecoration(
+            suffixIcon: isPassword
+                ? InkWell(
+                    splashFactory: NoSplash.splashFactory,
+                    onTap: () {
+                      authController.obscurePassword.value = !authController.obscurePassword.value;
+                    },
+                    child: Icon(
+                        authController.obscurePassword.value
+                            ? Icons.visibility_off_rounded
+                            : Icons.visibility,
+                        size: 20))
+                : const SizedBox(),
+            contentPadding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 5.h),
+            enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                gapPadding: 2,
+                borderRadius: BorderRadius.circular(15.r)),
+            disabledBorder: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                gapPadding: 2,
+                borderRadius: BorderRadius.circular(15.r)),
+            hintText: hintText,
+            filled: true,
+            fillColor: white,
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15.r),
+                gapPadding: 2,
+                borderSide: BorderSide(
+                  color: bgColor,
+                  width: 2.w,
+                )),
+            hintStyle: TextStyle(color: black, fontSize: 14.sp)),
       ),
-      onPressed: onTap,
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 16.sp, color: Colors.white, fontWeight: FontWeight.bold),
-      ));
+    );
+  }
+
+  Widget buttonWidget(void Function() onTap, String text) {
+    return ElevatedButton(
+        style: ButtonStyle(
+          shape: MaterialStatePropertyAll(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r))),
+          padding: MaterialStatePropertyAll(EdgeInsets.symmetric(horizontal: 90.w, vertical: 12.h)),
+          backgroundColor: MaterialStatePropertyAll(Color(0xff0c54be)),
+        ),
+        onPressed: onTap,
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 16.sp, color: Colors.white, fontWeight: FontWeight.bold),
+        ));
+  }
 }

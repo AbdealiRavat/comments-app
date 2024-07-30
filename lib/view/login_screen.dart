@@ -1,11 +1,10 @@
 import 'package:comments_app/utils/colors.dart';
-import 'package:comments_app/view/home_screen.dart';
 import 'package:comments_app/view/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../controller/login_controller.dart';
+import '../controller/auth_controller.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,7 +14,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  LoginController login = Get.put(LoginController());
+  TextEditingController emailTextController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  FocusNode emailFocusNode = FocusNode();
+  FocusNode passwordFocusNode = FocusNode();
+
+  AuthController authController = Get.put(AuthController());
 
   @override
   Widget build(BuildContext context) {
@@ -35,12 +40,11 @@ class _LoginScreenState extends State<LoginScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Spacer(),
-            commonTextField(login.emailController.value, 'Email', false),
-            commonTextField(login.passwordController.value, 'Password', true),
+            commonTextField(emailTextController, 'Email', false),
+            commonTextField(passwordController, 'Password', true),
             Spacer(),
             buttonWidget(() {
-              Navigator.pushAndRemoveUntil(
-                  context, MaterialPageRoute(builder: (context) => HomeScreen()), (route) => false);
+              authController.signIn(context, emailTextController, passwordController);
             }, 'Login'),
             SizedBox(height: 10.h),
             Row(
@@ -59,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 30.h)
+            SizedBox(height: 40.h)
           ],
         ),
       ),
