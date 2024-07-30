@@ -1,3 +1,6 @@
+import 'package:comments_app/utils/colors.dart';
+import 'package:comments_app/view/home_screen.dart';
+import 'package:comments_app/view/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -17,42 +20,46 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: bgColor,
       appBar: AppBar(
           title: Text(
-        'Comments',
-        style: TextStyle(
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.bold,
-            color: const Color(0xff0c54be),
-            fontSize: 24.sp),
-      )),
+            'Comments',
+            style: TextStyle(fontWeight: FontWeight.bold, color: primaryColor, fontSize: 24.sp),
+          ),
+          backgroundColor: bgColor),
       body: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: 15.w,
+          horizontal: 20.w,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Spacer(),
-            commonTextField(login.emailController.value, 'Email', Colors.black, true, false),
-            commonTextField(login.passwordController.value, 'Password', Colors.black, true, true),
+            commonTextField(login.emailController.value, 'Email', false),
+            commonTextField(login.passwordController.value, 'Password', true),
             Spacer(),
-            buttonWidget(() {}, 'Login'),
+            buttonWidget(() {
+              Navigator.pushAndRemoveUntil(
+                  context, MaterialPageRoute(builder: (context) => HomeScreen()), (route) => false);
+            }, 'Login'),
             SizedBox(height: 10.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  'New here?',
-                  style: TextStyle(fontSize: 14.sp, color: Colors.black),
-                ),
-                Text(
-                  ' Signup',
-                  style: TextStyle(fontSize: 14.sp, color: const Color(0xff0c54be)),
+                Text('New here?',
+                    style: TextStyle(fontSize: 14.sp, color: black, fontFamily: 'Poppins-bold')),
+                InkWell(
+                  onTap: () {
+                    Navigator.pushReplacement(
+                        context, MaterialPageRoute(builder: (context) => SignupScreen()));
+                  },
+                  child: Text(' Signup',
+                      style: TextStyle(
+                          fontSize: 14.sp, color: primaryColor, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
-            SizedBox(height: 10.h),
+            SizedBox(height: 30.h)
           ],
         ),
       ),
@@ -60,16 +67,14 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-Widget commonTextField(TextEditingController controller, String hintText, Color tColor,
-    bool isEnabled, bool isPassword) {
+Widget commonTextField(TextEditingController controller, String hintText, bool isPassword) {
   return Container(
-    padding: EdgeInsets.symmetric(vertical: 5),
-    margin: EdgeInsets.symmetric(vertical: 5),
+    padding: EdgeInsets.symmetric(vertical: 5.h),
+    margin: EdgeInsets.symmetric(vertical: 5.h),
     child: TextField(
       controller: controller,
       obscureText: isPassword ? true : false,
-      enabled: isEnabled,
-      style: TextStyle(color: tColor, fontSize: 16),
+      style: TextStyle(color: black, fontSize: 14.sp),
       textAlignVertical: TextAlignVertical.center,
       decoration: InputDecoration(
           // suffixIcon: isPassword
@@ -84,22 +89,26 @@ Widget commonTextField(TextEditingController controller, String hintText, Color 
           //             : Icons.visibility,
           //         size: 20))
           //     : const SizedBox(),
-          contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+          contentPadding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 5.h),
           enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide.none, gapPadding: 2, borderRadius: BorderRadius.circular(15)),
+              borderSide: BorderSide.none,
+              gapPadding: 2,
+              borderRadius: BorderRadius.circular(15.r)),
           disabledBorder: OutlineInputBorder(
-              borderSide: BorderSide.none, gapPadding: 2, borderRadius: BorderRadius.circular(15)),
+              borderSide: BorderSide.none,
+              gapPadding: 2,
+              borderRadius: BorderRadius.circular(15.r)),
           hintText: hintText,
           filled: true,
-          fillColor: const Color(0xfff5f5f5),
+          fillColor: white,
           focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(15.r),
               gapPadding: 2,
-              borderSide: const BorderSide(
-                color: Colors.grey,
-                width: 2,
+              borderSide: BorderSide(
+                color: bgColor,
+                width: 2.w,
               )),
-          hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 16)),
+          hintStyle: TextStyle(color: black, fontSize: 14.sp)),
     ),
   );
 }
@@ -115,10 +124,6 @@ Widget buttonWidget(void Function() onTap, String text) {
       onPressed: onTap,
       child: Text(
         text,
-        style: TextStyle(
-            fontSize: 16.sp,
-            color: Colors.white,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.bold),
+        style: TextStyle(fontSize: 16.sp, color: Colors.white, fontWeight: FontWeight.bold),
       ));
 }
